@@ -112,7 +112,6 @@
                 function getPosition() {
                     if (trackingStarted) {
                         var positions = ctrack.getCurrentPosition();
-                        // positions = [[x_0, y_0], [x_1,y_1], ... ]
                         console.log(positions[33]);
                     }
                 }
@@ -123,7 +122,7 @@
 
                     let rX = (150-coordinates[1]);
                     let rY = (200-coordinates[0]);
-                    
+
                     let translateX = (150-coordinates[0])*1.5;
 
                     front.style.transform = `perspective(525px) translateZ(0) rotateX(${rX/factorFront}deg) rotateY(${rY/factorFront}deg)`;
