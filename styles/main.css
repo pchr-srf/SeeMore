@@ -1,0 +1,104 @@
+@import url(https://fonts.googleapis.com/css?family=Lato:300italic,700italic,300,700);
+body {
+    font-family: 'Lato';
+    background-color: #f0f0f0;
+    margin: 0px auto;
+    max-width: 1150px;
+}
+#overlay {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    -o-transform : scaleX(-1);
+    -webkit-transform : scaleX(-1);
+    transform : scaleX(-1);
+    -ms-filter : fliph; /*IE*/
+    filter : fliph; /*IE*/
+}
+#videoel {
+    -o-transform : scaleX(-1);
+    -webkit-transform : scaleX(-1);
+    transform : scaleX(-1);
+    -ms-filter : fliph; /*IE*/
+    filter : fliph; /*IE*/
+}
+#container {
+    position : relative;
+    width : 370px;
+    /*margin : 0px auto;*/
+}
+#content {
+    margin-top : 70px;
+    margin-left : 100px;
+    margin-right : 100px;
+    max-width: 950px;
+}
+h2 {
+    font-weight : 400;
+}
+.nogum {
+    display : none;
+}
+.btn {
+    font-family: 'Lato';
+    font-size: 16px;
+}
+.hide {
+    display : none;
+}
+.nohide {
+    display : block;
+}
+
+
+
+
+#main {
+    position: absolute;
+    height: 500px;
+    width: 500px;
+    border: 1px solid black;
+    overflow: hidden;
+}
+
+#front,
+#back {
+    position: absolute;
+    transform-style: preserve-3d;
+    transition: all 150ms linear 0s;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#front {
+    background-image: url("../img/trump2.png");
+    background-position: 50% 75%;
+    width: 140%;
+    height: 140%;
+    top: -20%;
+    left: -20%;
+
+    z-index: 20;
+    transform: perspective(525px) translateZ(0px) rotateX(0deg) rotateY(0deg);
+}
+
+#back {
+    background-image: url("../img/putin.png");
+    z-index: 10;
+    
+    width: 80%;
+    height: 80%;
+    top: 15%;
+    left: 10%;
+    background-position: center bottom;
+
+    transform: perspective(525px) translateZ(-100px) rotateX(0deg) rotateY(0deg);
+}
+
+#bg {
+    width: 100%;
+    height: 100%;
+    background-image: url("../img/white_house.jpg");
+    background-size: cover;
+    background-position: center;
+}
