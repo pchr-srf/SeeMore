@@ -1,4 +1,4 @@
-.overlay {
+.seemore-video--overlay {
     position: absolute;
     top: 0px;
     left: 0px;
@@ -8,7 +8,7 @@
     -ms-filter : fliph; /*IE*/
     filter : fliph; /*IE*/
 }
-.videoel {
+.seemore-video--element {
     -o-transform : scaleX(-1);
     -webkit-transform : scaleX(-1);
     transform : scaleX(-1);

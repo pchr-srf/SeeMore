@@ -1,9 +1,9 @@
 class SeeMore {
     constructor() {
-        this.vid = document.getElementsByClassName('videoel')[0];
+        this.vid = document.getElementsByClassName('seemore-video--element')[0];
         this.vid_width = this.vid.width;
         this.vid_height = this.vid.height;
-        this.overlay = document.getElementsByClassName('overlay')[0];
+        this.overlay = document.getElementsByClassName('seemore-video--overlay')[0];
         this.overlayCC = this.overlay.getContext('2d');
         this.front = document.getElementsByClassName("seemore-image--front")[0];
         this.back  = document.getElementsByClassName("seemore-image--back")[0];
