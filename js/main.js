@@ -1,91 +1,99 @@
-let vid = document.getElementById('videoel');
-let vid_width = vid.width;
-let vid_height = vid.height;
-let overlay = document.getElementById('overlay');
-let overlayCC = overlay.getContext('2d');
-let front = document.getElementById("front");
-let back  = document.getElementById("back");
+class SeeMore {
+    constructor() {
+        this.vid = document.getElementsByClassName('videoel')[0];
+        this.vid_width = this.vid.width;
+        this.vid_height = this.vid.height;
+        this.overlay = document.getElementsByClassName('overlay')[0];
+        this.overlayCC = this.overlay.getContext('2d');
+        this.front = document.getElementsByClassName("seemore-image--front")[0];
+        this.back  = document.getElementsByClassName("seemore-image--back")[0];
 
-/*********** Setup of video/webcam and checking for webGL support *********/
-adjustVideoProportions = () => {
-    // resize overlay and video if proportions of video are not 4:3
-    // keep same height, just change width
-    let proportion = vid.videoWidth/vid.videoHeight;
-    vid_width = Math.round(vid_height * proportion);
-    vid.width = vid_width;
-    overlay.width = vid_width;
-}
-gumSuccess = (stream) => {
-    // add camera stream if getUserMedia succeeded
-    if ("srcObject" in vid) {
-        vid.srcObject = stream;
-    } else {
-        vid.src = (window.URL && window.URL.createObjectURL(stream));
+        this.ctrack = new clm.tracker();
+        this.ctrack.init();
+        this.trackingStarted = false;
+
+        this.factorFront = 10;
+        this.factorBack = 5;
+
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+        window.URL = window.URL || window.webkitURL || window.msURL || window.mozURL;
+        
+        // set up video
+        if (navigator.getUserMedia) {
+            navigator.getUserMedia({video : true}, stream => this.onSuccess(stream), this.onFail);
+        } else if (navigator.mediaDevices) {
+            navigator.mediaDevices.getUserMedia({video : true})
+                .then(this.onSuccess)
+                .catch(this.onFail);
+        } else {
+            this.onFail();
+        }
+        
+        this.vid.addEventListener('canplay', () => {this.startVideo();}, false);
     }
-    vid.onloadedmetadata = () => {
-        adjustVideoProportions();
-        vid.play();
+
+    /*********** Setup of video/webcam and checking for webGL support *********/
+    adjustVideoProportions() {
+        // resize overlay and video if proportions of video are not 4:3
+        // keep same height, just change width
+        let proportion = this.vid.videoWidth/this.vid.videoHeight;
+        this.vid_width = Math.round(this.vid_height * proportion);
+        this.vid.width = this.vid_width;
+        this.overlay.width = this.vid_width;
     }
-    vid.onresize = () => {
-        adjustVideoProportions();
-        if (trackingStarted) {
-            ctrack.stop();
-            ctrack.reset();
-            ctrack.start(vid);
+
+    onSuccess(stream) {
+        // add camera stream if getUserMedia succeeded
+        if ("srcObject" in this.vid) {
+            this.vid.srcObject = stream;
+        } else {
+            this.vid.src = (window.URL && window.URL.createObjectURL(stream));
+        }
+        this.vid.onloadedmetadata = () => {
+            this.adjustVideoProportions();
+            this.vid.play();
+        }
+        this.vid.onresize = () => {
+            this.adjustVideoProportions();
+            if (this.trackingStarted) {
+                this.ctrack.stop();
+                this.ctrack.reset();
+                this.ctrack.start(this.vid);
+            }
         }
     }
-}
-gumFail = () => {
-    alert("There was some problem trying to fetch video from your webcam");
-}
+    onFail() {
+        alert("There was some problem trying to fetch video from your webcam");
+    }
 
-/*********** Code for face tracking *********/
-let ctrack = new clm.tracker();
-ctrack.init();
-let trackingStarted = false;
+    startVideo() {
+        this.vid.play();
+        this.ctrack.start(this.vid);
+        this.trackingStarted = true;
+        
+        this.drawLoop();
+    }
 
-startVideo = () => {
-    vid.play();
-    ctrack.start(vid);
-    trackingStarted = true;
-    
-    drawLoop();
-}
+    drawLoop() {
+        window.requestAnimationFrame(() => {this.drawLoop();    });
+        this.overlayCC.clearRect(0, 0, this.vid_width, this.vid_height);
+        if (this.ctrack.getCurrentPosition()) {
+            this.ctrack.draw(this.overlay);
 
-drawLoop = () => {
-    window.requestAnimationFrame(drawLoop);
-    overlayCC.clearRect(0, 0, vid_width, vid_height);
-    if (ctrack.getCurrentPosition()) {
-        ctrack.draw(overlay);
+            this.updateImages( this.ctrack.getCurrentPosition()[33] );
+        }
+    }
 
-        updateImages( ctrack.getCurrentPosition()[33] );
+    updateImages(coordinates) {
+        let rX = (150-coordinates[1]);
+        let rY = (200-coordinates[0]);
+
+        let translateX = (150-coordinates[0])*1.5;
+
+        this.front.style.transform = `perspective(525px) translateZ(0) rotateX(${rX/this.factorFront}deg) rotateY(${rY/this.factorFront}deg)`;
+        this.back.style.transform = `perspective(525px) translateX(${translateX}px) translateZ(-100px) rotateX(${rX/this.factorBack}deg) rotateY(${rY/this.factorBack}deg)`;
     }
 }
 
-updateImages = (coordinates) => {
-    let factorFront = 10;
-    let factorBack = 5;
 
-    let rX = (150-coordinates[1]);
-    let rY = (200-coordinates[0]);
-
-    let translateX = (150-coordinates[0])*1.5;
-
-    front.style.transform = `perspective(525px) translateZ(0) rotateX(${rX/factorFront}deg) rotateY(${rY/factorFront}deg)`;
-    back.style.transform = `perspective(525px) translateX(${translateX}px) translateZ(-100px) rotateX(${rX/factorBack}deg) rotateY(${rY/factorBack}deg)`;
-}
-
-
-navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
-window.URL = window.URL || window.webkitURL || window.msURL || window.mozURL;
-
-// set up video
-if (navigator.mediaDevices) {
-    navigator.mediaDevices.getUserMedia({video : true}).then(gumSuccess).catch(gumFail);
-} else if (navigator.getUserMedia) {
-    navigator.getUserMedia({video : true}, gumSuccess, gumFail);
-} else {
-    gumFail();
-}
-
-vid.addEventListener('canplay', startVideo, false);
+new SeeMore();
